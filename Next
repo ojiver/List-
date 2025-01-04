@@ -1,0 +1,501 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "!mkdir -p drive\n",
+        "!google-drive-ocamlfuse drive"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "QtudYOaS7lC2",
+        "outputId": "cea2e1d8-543d-4927-febd-0bc16596ecef"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Thread 1 killed on uncaught exception Unix.Unix_error(50, \"bind\", \"\")\n",
+            "/usr/bin/xdg-open: 882: www-browser: not found\n",
+            "/usr/bin/xdg-open: 882: links2: not found\n",
+            "/usr/bin/xdg-open: 882: elinks: not found\n",
+            "/usr/bin/xdg-open: 882: links: not found\n",
+            "/usr/bin/xdg-open: 882: lynx: not found\n",
+            "/usr/bin/xdg-open: 882: w3m: not found\n",
+            "xdg-open: no method available for opening 'https://accounts.google.com/o/oauth2/auth?client_id=None&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Foauth2callback&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&response_type=code&access_type=offline&approval_prompt=force'\n",
+            "/bin/sh: 1: firefox: not found\n",
+            "/bin/sh: 1: google-chrome: not found\n",
+            "/bin/sh: 1: chromium-browser: not found\n",
+            "/usr/bin/open: 882: www-browser: not found\n",
+            "/usr/bin/open: 882: links2: not found\n",
+            "/usr/bin/open: 882: elinks: not found\n",
+            "/usr/bin/open: 882: links: not found\n",
+            "/usr/bin/open: 882: lynx: not found\n",
+            "/usr/bin/open: 882: w3m: not found\n",
+            "xdg-open: no method available for opening 'https://accounts.google.com/o/oauth2/auth?client_id=None&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Foauth2callback&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&response_type=code&access_type=offline&approval_prompt=force'\n",
+            "Error: Error opening URL:https://accounts.google.com/o/oauth2/auth?client_id=None&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Foauth2callback&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&response_type=code&access_type=offline&approval_prompt=force\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "CTHW7jWE6uyT",
+        "outputId": "b946f070-c5ed-4bba-dae9-11b9db6ad43d",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "E: Package 'python-software-properties' has no installation candidate\n",
+            "E: Package 'module-init-tools' has no installation candidate\n",
+            "W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)\n",
+            "W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)\n",
+            "Please, open the following URL in a web browser: https://accounts.google.com/o/oauth2/auth?client_id=None&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Foauth2callback&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&response_type=code&access_type=offline&approval_prompt=force\n",
+            "··········\n",
+            "Please, open the following URL in a web browser: https://accounts.google.com/o/oauth2/auth?client_id=None&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Foauth2callback&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&response_type=code&access_type=offline&approval_prompt=force\n",
+            "Please enter the verification code: Cannot retrieve auth tokens.\n",
+            "Failure(\"Unexpected error response: {\\n  \\\"error\\\": \\\"invalid_request\\\",\\n  \\\"error_description\\\": \\\"Missing required parameter: code\\\"\\n}\")\n"
+          ]
+        }
+      ],
+      "source": [
+        "!apt-get install -y -qq software-properties-common python-software-properties module-init-tools\n",
+        "!add-apt-repository -y ppa:alessandro-strada/ppa 2>&1 > /dev/null\n",
+        "!apt-get update -qq 2>&1 > /dev/null\n",
+        "!apt-get -y install -qq google-drive-ocamlfuse fuse\n",
+        "from google.colab import auth\n",
+        "auth.authenticate_user()\n",
+        "from oauth2client.client import GoogleCredentials\n",
+        "creds = GoogleCredentials.get_application_default()\n",
+        "import getpass\n",
+        "!google-drive-ocamlfuse -headless -id={creds.client_id} -secret={creds.client_secret} < /dev/null 2>&1 | grep URL\n",
+        "vcode = getpass.getpass()\n",
+        "!echo {vcode} | google-drive-ocamlfuse -headless -id={creds.client_id} -secret={creds.client_secret}"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "ls"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "lSBo-QC67ydP",
+        "outputId": "b281a03c-28fd-4d37-ac40-3293620b5d46"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[0m\u001b[01;34mdrive\u001b[0m/  \u001b[01;34msample_data\u001b[0m/\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import tensorflow as tf\n",
+        "tf.test.gpu_device_name()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "4gDT8z_X7_cH",
+        "outputId": "741ceeac-b29b-4a98-8540-671b58bb5407"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "''"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!/opt/bin/nvidia-smi"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "W-TVvOuo8VFf",
+        "outputId": "a4fc531e-357c-495a-f997-61df5827da45"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/bin/bash: line 1: /opt/bin/nvidia-smi: No such file or directory\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from tensorflow.python.client import device_lib\n",
+        "device_lib.list_local_devices()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1CqUgCRS8fJT",
+        "outputId": "c0c4fa29-ca00-4468-e5ee-51364201f85e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[name: \"/device:CPU:0\"\n",
+              " device_type: \"CPU\"\n",
+              " memory_limit: 268435456\n",
+              " locality {\n",
+              " }\n",
+              " incarnation: 16623291758496460972\n",
+              " xla_global_id: -1]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install -q keras\n",
+        "import keras"
+      ],
+      "metadata": {
+        "id": "hv8A4KUb8yJo"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip uninstall -y keras\n",
+        "# 注意這是用-y是因為，google筆電只會顯示結果不能輸入，因此避免安裝過程中需要你輸入yes什麼的"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Lmv3i9oS84ev",
+        "outputId": "bf806fb4-0b63-43e5-bb02-cd5a33e11485"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[33mWARNING: Skipping keras as it is not installed.\u001b[0m\u001b[33m\n",
+            "\u001b[0m"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 注意不能用!cd ../\n",
+        "!pwd\n",
+        "import os\n",
+        "os.chdir('../')\n",
+        "!pwd\n",
+        "%cd /"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "oexwx71S9AUt",
+        "outputId": "4fd06df1-ba05-44fb-8928-a75ea948cdf7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content\n",
+            "/\n",
+            "/content\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!git clone https://github.com/wxs/keras-mnist-tutorial.git"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DbkrICsy9ToN",
+        "outputId": "8150a18c-dd2e-4b2f-f495-5fa50a62c3a9"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Cloning into 'keras-mnist-tutorial'...\n",
+            "remote: Enumerating objects: 26, done.\u001b[K\n",
+            "remote: Total 26 (delta 0), reused 0 (delta 0), pack-reused 26 (from 1)\u001b[K\n",
+            "Receiving objects: 100% (26/26), 341.08 KiB | 2.04 MiB/s, done.\n",
+            "Resolving deltas: 100% (12/12), done.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!wget https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/datasets/Titanic.csv -P drive/app"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wbzEgjh_9XwD",
+        "outputId": "ec4eccd1-1e84-44d7-952f-3310a0c1e61a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "--2024-11-03 12:18:01--  https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/datasets/Titanic.csv\n",
+            "Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.109.133, 185.199.110.133, 185.199.111.133, ...\n",
+            "Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.109.133|:443... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 846 [text/plain]\n",
+            "Saving to: ‘drive/app/Titanic.csv’\n",
+            "\n",
+            "Titanic.csv         100%[===================>]     846  --.-KB/s    in 0s      \n",
+            "\n",
+            "2024-11-03 12:18:01 (26.1 MB/s) - ‘drive/app/Titanic.csv’ saved [846/846]\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!cat /proc/meminfo"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SZaJXZZm9hBA",
+        "outputId": "02f015c5-988f-4a85-d567-79ea433f0548"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "MemTotal:       13290460 kB\n",
+            "MemFree:         8120172 kB\n",
+            "MemAvailable:   11860436 kB\n",
+            "Buffers:          436788 kB\n",
+            "Cached:          3438896 kB\n",
+            "SwapCached:            0 kB\n",
+            "Active:          1100672 kB\n",
+            "Inactive:        3739256 kB\n",
+            "Active(anon):       1440 kB\n",
+            "Inactive(anon):   964628 kB\n",
+            "Active(file):    1099232 kB\n",
+            "Inactive(file):  2774628 kB\n",
+            "Unevictable:           8 kB\n",
+            "Mlocked:               8 kB\n",
+            "SwapTotal:             0 kB\n",
+            "SwapFree:              0 kB\n",
+            "Dirty:               288 kB\n",
+            "Writeback:             0 kB\n",
+            "AnonPages:        964388 kB\n",
+            "Mapped:           652716 kB\n",
+            "Shmem:              1816 kB\n",
+            "KReclaimable:     191808 kB\n",
+            "Slab:             237124 kB\n",
+            "SReclaimable:     191808 kB\n",
+            "SUnreclaim:        45316 kB\n",
+            "KernelStack:        6080 kB\n",
+            "PageTables:        15120 kB\n",
+            "SecPageTables:         0 kB\n",
+            "NFS_Unstable:          0 kB\n",
+            "Bounce:                0 kB\n",
+            "WritebackTmp:          0 kB\n",
+            "CommitLimit:     6645228 kB\n",
+            "Committed_AS:    3333124 kB\n",
+            "VmallocTotal:   34359738367 kB\n",
+            "VmallocUsed:       12440 kB\n",
+            "VmallocChunk:          0 kB\n",
+            "Percpu:             1144 kB\n",
+            "HardwareCorrupted:     0 kB\n",
+            "AnonHugePages:         0 kB\n",
+            "ShmemHugePages:        0 kB\n",
+            "ShmemPmdMapped:        0 kB\n",
+            "FileHugePages:         0 kB\n",
+            "FilePmdMapped:         0 kB\n",
+            "CmaTotal:              0 kB\n",
+            "CmaFree:               0 kB\n",
+            "Unaccepted:            0 kB\n",
+            "HugePages_Total:       0\n",
+            "HugePages_Free:        0\n",
+            "HugePages_Rsvd:        0\n",
+            "HugePages_Surp:        0\n",
+            "Hugepagesize:       2048 kB\n",
+            "Hugetlb:               0 kB\n",
+            "DirectMap4k:       70456 kB\n",
+            "DirectMap2M:     6217728 kB\n",
+            "DirectMap1G:     9437184 kB\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!cat /proc/cpuinfo"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KQoHXgQK9lbw",
+        "outputId": "754e7c11-ed04-4dac-d9a8-f101cec75d1c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "processor\t: 0\n",
+            "vendor_id\t: GenuineIntel\n",
+            "cpu family\t: 6\n",
+            "model\t\t: 79\n",
+            "model name\t: Intel(R) Xeon(R) CPU @ 2.20GHz\n",
+            "stepping\t: 0\n",
+            "microcode\t: 0xffffffff\n",
+            "cpu MHz\t\t: 2200.164\n",
+            "cache size\t: 56320 KB\n",
+            "physical id\t: 0\n",
+            "siblings\t: 2\n",
+            "core id\t\t: 0\n",
+            "cpu cores\t: 1\n",
+            "apicid\t\t: 0\n",
+            "initial apicid\t: 0\n",
+            "fpu\t\t: yes\n",
+            "fpu_exception\t: yes\n",
+            "cpuid level\t: 13\n",
+            "wp\t\t: yes\n",
+            "flags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap xsaveopt arat md_clear arch_capabilities\n",
+            "bugs\t\t: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa mmio_stale_data retbleed bhi\n",
+            "bogomips\t: 4400.32\n",
+            "clflush size\t: 64\n",
+            "cache_alignment\t: 64\n",
+            "address sizes\t: 46 bits physical, 48 bits virtual\n",
+            "power management:\n",
+            "\n",
+            "processor\t: 1\n",
+            "vendor_id\t: GenuineIntel\n",
+            "cpu family\t: 6\n",
+            "model\t\t: 79\n",
+            "model name\t: Intel(R) Xeon(R) CPU @ 2.20GHz\n",
+            "stepping\t: 0\n",
+            "microcode\t: 0xffffffff\n",
+            "cpu MHz\t\t: 2200.164\n",
+            "cache size\t: 56320 KB\n",
+            "physical id\t: 0\n",
+            "siblings\t: 2\n",
+            "core id\t\t: 0\n",
+            "cpu cores\t: 1\n",
+            "apicid\t\t: 1\n",
+            "initial apicid\t: 1\n",
+            "fpu\t\t: yes\n",
+            "fpu_exception\t: yes\n",
+            "cpuid level\t: 13\n",
+            "wp\t\t: yes\n",
+            "flags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap xsaveopt arat md_clear arch_capabilities\n",
+            "bugs\t\t: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa mmio_stale_data retbleed bhi\n",
+            "bogomips\t: 4400.32\n",
+            "clflush size\t: 64\n",
+            "cache_alignment\t: 64\n",
+            "address sizes\t: 46 bits physical, 48 bits virtual\n",
+            "power management:\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "pbrcKRjf9p-L"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
